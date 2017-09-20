@@ -57,32 +57,27 @@ def init_hardware():
     GPIO.setmode(GPIO.BCM)
   
     # setup input switches
-    GPIO.setup(12, GPIO.IN)
-    GPIO.setup(14, GPIO.IN)
-    GPIO.setup(15, GPIO.IN)
-    GPIO.setup(16, GPIO.IN)
+    GPIO.setup(21, GPIO.IN)
     GPIO.setup(17, GPIO.IN)
-
+    
+    GPIO.setup(5, GPIO.IN)
+    
+    GPIO.setup(13, GPIO.IN)
     GPIO.setup(22, GPIO.IN)
-    GPIO.setup(23, GPIO.IN)
-    GPIO.setup(24, GPIO.IN)
-    GPIO.setup(25, GPIO.IN)
 
     # setup next switch
     
     # setup gpio interrupts
     # next button
-    GPIO.add_event_detect(12, GPIO.RISING, callback=next,bouncetime=100)
-    #
-    GPIO.add_event_detect(14, GPIO.RISING, callback=up1000back,bouncetime=100)
-    GPIO.add_event_detect(15, GPIO.RISING, callback=up100back,bouncetime=100)
-    GPIO.add_event_detect(16, GPIO.RISING, callback=up10back,bouncetime=100)
-    GPIO.add_event_detect(17, GPIO.RISING, callback=up1back,bouncetime=100)
+    GPIO.add_event_detect(21, GPIO.RISING, callback=next,bouncetime=100)
     
-    GPIO.add_event_detect(22, GPIO.RISING, callback=dn1000back,bouncetime=100)
-    GPIO.add_event_detect(23, GPIO.RISING, callback=dn100back,bouncetime=100)
-    GPIO.add_event_detect(24, GPIO.RISING, callback=dn10back,bouncetime=100)
-    GPIO.add_event_detect(25, GPIO.RISING, callback=dn1back,bouncetime=100)
+    GPIO.add_event_detect(17, GPIO.RISING, callback=up,bouncetime=100)
+    
+    GPIO.add_event_detect(22, GPIO.RISING, callback=down,bouncetime=100)
+    
+    GPIO.add_event_detect(5, GPIO.RISING, callback=left,bouncetime=100)
+    
+    GPIO.add_event_detect(13, GPIO.RISING, callback=right,bouncetime=100)
     
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
@@ -94,55 +89,41 @@ def next(channel):
     print("next button pushed")
     global index
     index += 1
+def up(channel):
+    global value, digit
+    value += digit
+    print("pushed up",digit)
+def down(channel):
+    global value, digit
+    value -= digit
+    print("pushed down",digit)
+def left(channel):
+    global digit
+    if digit < 1000:
+        digit *=10
     
-def up1back(channel):
-    global value
-    value += 1
-    
-def up10back(channel):
-    global value
-    value += 10
-def up100back(channel):
-    global value
-    value += 100
-    
-def up1000back(channel):
-    global value
-    value += 1000
-    
-def dn1back(channel):
-    global value
-    value -= 1
-    
-def dn10back(channel):
-    global value
-    value -= 10
-def dn100back(channel):
-    global value
-    value -= 100
-    
-def dn1000back(channel):
-    global value
-    value -= 1000
-
+def right(channel):
+    global digit
+    if digit > 1:
+        digit = int(digit/10)
 '''
 def process_GPIO(value):
-    if GPIO.input(14) == 0:
+    if GPIO.input(17) == 0:
         value += 1000
-    if GPIO.input(15) == 0:
+    if GPIO.input(17) == 0:
         value += 100
-    if GPIO.input(16) == 0:
+    if GPIO.input(17) == 0:
         value += 10
     if GPIO.input(17) == 0:
         value += 1
 
-    if GPIO.input(22) == 0:
+    if GPIO.input(05) == 0:
         value -= 1000
-    if GPIO.input(23) == 0:
+    if GPIO.input(05) == 0:
         value -= 100
-    if GPIO.input(24) == 0:
+    if GPIO.input(05) == 0:
         value -= 10
-    if GPIO.input(25) == 0:
+    if GPIO.input(05) == 0:
         value -= 1
 
     return value
@@ -190,6 +171,7 @@ if __name__ == '__main__':
     value = 0
     display = init_hardware()
     index = 0
+    digit = 1
     init_monitor()
 
     input_number(34)    
@@ -204,9 +186,12 @@ try:
         #pygame.display.flip() #지우는??
         screen = pygame.display.get_surface()
         screen.fill((0,0,0))
+        input_number(34)   
         if a < 0:
             a = 0
-        input_number(input_list[index])
+        elif a>9999:
+            a = 9999
+
         if a==0:
             timer(a/10,togle%30>15)
         else:
@@ -214,7 +199,8 @@ try:
         pygame.display.update()
         if value < 0:
             value = 0
-
+        elif value>9999:
+            value = 9999
         sval = "Value: {:04}".format(value)
         sval = sval[:-1] + "." + sval[-1:] #인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
         #print(sval)
