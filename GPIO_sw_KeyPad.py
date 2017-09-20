@@ -33,6 +33,8 @@ keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS,col_pins=COL_PIN
 def printKey(key):
     print(key)
 keypad.registerKeyPressHandler(printKey)
+input_list = [123,1234,2345,4576,3543,6789]
+input_list.append(9999)
 def toggle_fullscreen():
     screen = pygame.display.get_surface()
     tmp = screen.convert()
@@ -69,6 +71,7 @@ def init_hardware():
     GPIO.setmode(GPIO.BCM)
   
     # setup input switches
+    GPIO.setup(12, GPIO.IN)
     GPIO.setup(14, GPIO.IN)
     GPIO.setup(15, GPIO.IN)
     GPIO.setup(16, GPIO.IN)
@@ -80,42 +83,90 @@ def init_hardware():
     GPIO.setup(25, GPIO.IN)
 
     # setup next switch
-
-
+    
+    # setup gpio interrupts
+    # next button
+    GPIO.add_event_detect(12, GPIO.RISING, callback=next,bouncetime=100)
+    #
+    GPIO.add_event_detect(14, GPIO.RISING, callback=up1000back,bouncetime=100)
+    GPIO.add_event_detect(15, GPIO.RISING, callback=up100back,bouncetime=100)
+    GPIO.add_event_detect(16, GPIO.RISING, callback=up10back,bouncetime=100)
+    GPIO.add_event_detect(17, GPIO.RISING, callback=up1back,bouncetime=100)
+    
+    GPIO.add_event_detect(22, GPIO.RISING, callback=dn1000back,bouncetime=100)
+    GPIO.add_event_detect(23, GPIO.RISING, callback=dn100back,bouncetime=100)
+    GPIO.add_event_detect(24, GPIO.RISING, callback=dn10back,bouncetime=100)
+    GPIO.add_event_detect(25, GPIO.RISING, callback=dn1back,bouncetime=100)
+    
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
     lcd.clear()
 
     return lcd
 
+def next(channel):
+    print("next button pushed")
+    global index
+    index += 1
+    
+def up1back(channel):
+    global value
+    value += 1
+    
+def up10back(channel):
+    global value
+    value += 10
+def up100back(channel):
+    global value
+    value += 100
+    
+def up1000back(channel):
+    global value
+    value += 1000
+    
+def dn1back(channel):
+    global value
+    value -= 1
+    
+def dn10back(channel):
+    global value
+    value -= 10
+def dn100back(channel):
+    global value
+    value -= 100
+    
+def dn1000back(channel):
+    global value
+    value -= 1000
 
+'''
 def process_GPIO(value):
     if GPIO.input(14) == 0:
-        value += 100
+        value += 1000
     if GPIO.input(15) == 0:
-        value += 10
+        value += 100
     if GPIO.input(16) == 0:
-        value += 1
+        value += 10
     if GPIO.input(17) == 0:
-        value += .1
+        value += 1
 
     if GPIO.input(22) == 0:
-        value -= 100
+        value -= 1000
     if GPIO.input(23) == 0:
-        value -= 10
+        value -= 100
     if GPIO.input(24) == 0:
-        value -= 1
+        value -= 10
     if GPIO.input(25) == 0:
-        value -= .1
+        value -= 1
 
     return value
-
-def input_number(num):
+'''
+def input_number(num=34):
     # display the given number
     screen = pygame.display.get_surface()
 
     clock = pygame.time.Clock()
-    print("before render", clock.get_time())
+    #print("before render", clock.get_time())
 
     basicfont = pygame.font.SysFont(None, 48)
     text = basicfont.render(str(num), True, (255, 0, 0), (255, 255, 255))
@@ -123,12 +174,21 @@ def input_number(num):
     textrect.centerx = screen.get_rect().centerx
     textrect.centery = screen.get_rect().centery
      
-    screen.fill((255, 255, 255))
     screen.blit(text, textrect)
-     
-    pygame.display.update()
     clock.tick()
-    print("after render", clock.get_time())
+    
+def timer(num,togle=True):
+    # display the given number
+    screen = pygame.display.get_surface()
+    
+    basicfont = pygame.font.SysFont(None, 48)
+    text = basicfont.render("timer :"+str(num), True, (255, 0, 0), (255, 255, 255))
+    textrect = text.get_rect()
+    textrect.centerx = screen.get_rect().centerx + 250
+    textrect.centery = screen.get_rect().centery + 250
+    if togle:
+        screen.blit(text, textrect)
+    #print("after render", clock.get_time())
        
     # receive input from GPIO
 
@@ -141,28 +201,42 @@ def input_number(num):
 
 
 if __name__ == '__main__':
-    value = 0.0
+    value = 0
     display = init_hardware()
-    
+    index = 0
     init_monitor()
 
     input_number(34)    
 
-try: 
-    while True:   
-        value = process_GPIO(value)
+try:
+    a=100
+    togle = 0
+    while True:
+        a-=1
+        togle+=1
+       # value = process_GPIO(value)
+        #pygame.display.flip() #지우는??
+        screen = pygame.display.get_surface()
+        screen.fill((0,0,0))
+        if a < 0:
+            a = 0
+        input_number(input_list[index])
+        if a==0:
+            timer(a/10,togle%30>15)
+        else:
+            timer(a/10,True)
+        pygame.display.update()
+        if value < 0:
+            value = 0
 
-        if value < 0.0:
-            value = 0.0
-
-        sval = "Value: {:05}".format(value)
-        print(sval)
-
+        sval = "Value: {:04}".format(value)
+        sval = sval[:-1] + "." + sval[-1:] #인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
+        #print(sval)
+        
         display.addstr(sval, 0)
+        
 
-
-        time.sleep(.1)
+        time.sleep(.01)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
-
