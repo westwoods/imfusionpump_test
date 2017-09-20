@@ -18,6 +18,7 @@ from pygame.locals import *
 import RPi.GPIO as GPIO
 import time
 import ST7032I2C
+import timeit
 
 input_list = [123,1234,2345,4576,3543,6789]
 input_list.append(9999)
@@ -87,8 +88,12 @@ def init_hardware():
 
 def next(channel):
     print("next button pushed")
-    global index
+    global index, start, end
     index += 1
+    
+    end = timeit.default_timer()
+    print("runtime",end - start)
+    start = timeit.default_timer()
 def up(channel):
     global value, digit
     value += digit
@@ -106,6 +111,9 @@ def right(channel):
     global digit
     if digit > 1:
         digit = int(digit/10)
+        
+
+    
 '''
 def process_GPIO(value):
     if GPIO.input(17) == 0:
@@ -173,9 +181,8 @@ if __name__ == '__main__':
     index = 0
     digit = 1
     init_monitor()
-
-    input_number(34)    
-
+   
+    start = timeit.default_timer()
 try:
     a=100
     togle = 0
@@ -186,7 +193,7 @@ try:
         #pygame.display.flip() #지우는??
         screen = pygame.display.get_surface()
         screen.fill((0,0,0))
-        input_number(34)   
+        input_number(input_list[index])   
         if a < 0:
             a = 0
         elif a>9999:

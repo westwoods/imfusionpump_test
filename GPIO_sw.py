@@ -18,6 +18,7 @@ from pygame.locals import *
 import RPi.GPIO as GPIO
 import time
 import ST7032I2C
+import timeit
 
 input_list = [123,1234,2345,4576,3543,6789]
 input_list.append(9999)
@@ -90,11 +91,15 @@ def init_hardware():
 
     return lcd
 
+
 def next(channel):
     print("next button pushed")
-    global index
+    global index, start, end
     index += 1
     
+    end = timeit.default_timer()
+    print("runtime", end - start)
+    start = timeit.default_timer()
 def up1back(channel):
     global value
     value += 1
@@ -191,8 +196,7 @@ if __name__ == '__main__':
     display = init_hardware()
     index = 0
     init_monitor()
-
-    input_number(34)    
+    start = timeit.default_timer()
 
 try:
     a=100
