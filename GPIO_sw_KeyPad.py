@@ -70,34 +70,11 @@ def init_hardware():
     
     GPIO.setmode(GPIO.BCM)
   
-    # setup input switches
-    GPIO.setup(12, GPIO.IN)
-    GPIO.setup(14, GPIO.IN)
-    GPIO.setup(15, GPIO.IN)
-    GPIO.setup(16, GPIO.IN)
-    GPIO.setup(17, GPIO.IN)
-
-    GPIO.setup(22, GPIO.IN)
-    GPIO.setup(23, GPIO.IN)
-    GPIO.setup(24, GPIO.IN)
-    GPIO.setup(25, GPIO.IN)
-
     # setup next switch
     
     # setup gpio interrupts
     # next button
-    GPIO.add_event_detect(12, GPIO.RISING, callback=next,bouncetime=100)
-    #
-    GPIO.add_event_detect(14, GPIO.RISING, callback=up1000back,bouncetime=100)
-    GPIO.add_event_detect(15, GPIO.RISING, callback=up100back,bouncetime=100)
-    GPIO.add_event_detect(16, GPIO.RISING, callback=up10back,bouncetime=100)
-    GPIO.add_event_detect(17, GPIO.RISING, callback=up1back,bouncetime=100)
-    
-    GPIO.add_event_detect(22, GPIO.RISING, callback=dn1000back,bouncetime=100)
-    GPIO.add_event_detect(23, GPIO.RISING, callback=dn100back,bouncetime=100)
-    GPIO.add_event_detect(24, GPIO.RISING, callback=dn10back,bouncetime=100)
-    GPIO.add_event_detect(25, GPIO.RISING, callback=dn1back,bouncetime=100)
-    
+ 
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
     lcd.clear()
