@@ -31,21 +31,28 @@ ROW_PINS = [5,6,13,19] # 2,7,6,4
 COL_PINS = [26,20,21] #3,1,5
 factory = rpi_gpio.KeypadFactory()
 keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS,col_pins=COL_PINS)
-digit = 10000
+digit = 10
 def printKey(key):
     global value,digit
-    if key == "←" or key == ".":
-        print(key,digit)
-        
-        value=int(value-int(value%(digit*10)/digit)*digit)
-        if digit<10000:
-            digit*=10
+    if key == "←":
+        if digit ==1:
+            value=int(value-int(value%(digit*10)/digit)*digit)
+            if digit<10000:
+                digit*=10
+        else :
+            value=int((value-(value%100))/10)+value%10
+            if digit>10:
+                digit/=10
+    elif key == ".":
+        digit = 1
     else:
-        if digit > 1:
-            digit=int(digit/10)
-        value=int(value-int(value%(digit*10)/digit)*digit+key*digit)
-        print(value," ",int(value%(digit*10)/digit)*digit," ",digit)
-
+        if digit == 1:
+            value=int(value-int(value%(digit*10)/digit)*digit)+key
+        else:
+            if value<1000:
+                value=value*10+key*10
+            if digit<10000:
+                digit*=10
 keypad.registerKeyPressHandler(printKey)
 input_list = [123,1234,2345,4576,3543,6789]
 input_list.append(9999)
@@ -103,7 +110,8 @@ def next(channel):
     start = timeit.default_timer()
     a = 100
     value = 0
-    digit = 1000
+    digit = 10
+
     
 def up1back(channel):
     global value
@@ -225,8 +233,10 @@ try:
         if value < 0:
             value = 0
 
-        sval = "Value: {:04}".format(value)
-        sval = sval[:-1] + "." + sval[-1:] #인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
+        sval = "Value: {:}".format(int(value/10))
+        if digit==1 or (value%10 != 0):
+            sval = sval+"."+str( "" if value%10==0 else value%10)
+        sval =sval+"       "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
         #print(sval)
         
         display.addstr(sval, 0)

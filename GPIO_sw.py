@@ -98,12 +98,15 @@ def init_hardware():
 
 def next(channel):
     print("next button pushed")
-    global index, start, end
+    global index, start, end, a, value
     index += 1
     
     end = timeit.default_timer()
     print("runtime", end - start)
     start = timeit.default_timer()
+    a = 100
+    value = 0
+    
 def up1back(channel):
     global value
     value += 1
