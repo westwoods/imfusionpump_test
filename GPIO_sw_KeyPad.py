@@ -19,19 +19,33 @@ import RPi.GPIO as GPIO
 import time
 import ST7032I2C
 from pad4pi import rpi_gpio
+import timeit
 
 KEYPAD = [
     [1,2,3],
     [4,5,6],
     [7,8,9],
-    ["*",0,"#"],
+    [".",0,"←"],
     ]
 ROW_PINS = [5,6,13,19] # 2,7,6,4 
 COL_PINS = [26,20,21] #3,1,5
 factory = rpi_gpio.KeypadFactory()
 keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS,col_pins=COL_PINS)
+digit = 10000
 def printKey(key):
-    print(key)
+    global value,digit
+    if key == "←" or key == ".":
+        print(key,digit)
+        
+        value=int(value-int(value%(digit*10)/digit)*digit)
+        if digit<10000:
+            digit*=10
+    else:
+        if digit > 1:
+            digit=int(digit/10)
+        value=int(value-int(value%(digit*10)/digit)*digit+key*digit)
+        print(value," ",int(value%(digit*10)/digit)*digit," ",digit)
+
 keypad.registerKeyPressHandler(printKey)
 input_list = [123,1234,2345,4576,3543,6789]
 input_list.append(9999)
@@ -69,12 +83,11 @@ def init_monitor(SW = 1024, SH = 768):
 def init_hardware():
     
     GPIO.setmode(GPIO.BCM)
-  
-    # setup next switch
-    
-    # setup gpio interrupts
+    GPIO.setup(17, GPIO.IN)
     # next button
- 
+    GPIO.add_event_detect(17, GPIO.RISING, callback=next,bouncetime=100)
+    
+
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
     lcd.clear()
@@ -83,8 +96,15 @@ def init_hardware():
 
 def next(channel):
     print("next button pushed")
-    global index
+    global index, start, end, a, value, digit
     index += 1
+    
+    end = timeit.default_timer()
+    print("runtime",end - start)
+    start = timeit.default_timer()
+    a = 100
+    value = 0
+    digit = 1000
     
 def up1back(channel):
     global value
@@ -183,7 +203,7 @@ if __name__ == '__main__':
     index = 0
     init_monitor()
 
-    input_number(34)    
+    start = timeit.default_timer()  
 
 try:
     a=100

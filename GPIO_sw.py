@@ -19,6 +19,7 @@ from pygame.locals import *
 import RPi.GPIO as GPIO
 import time
 import ST7032I2C
+import timeit
 import pad4pi
 
 def toggle_fullscreen():
@@ -90,43 +91,64 @@ def init_hardware():
 
     return lcd
 
+
 def next(channel):
     print("next button pushed")
-    global index, input_list, end
+    global index, input_list, start, end_flag, end
     if index<len(input_list)-1:
         index += 1
     else:
-        end = True
+        end_flag = True
     
+    end = timeit.default_timer()
+    print("runtime", end - start)
+    start = timeit.default_timer()
 def up1back(channel):
     global value
-    value += 1
+    digit = 1
+    if (value%(digit*10))/10 <9:
+        value += digit
     
 def up10back(channel):
     global value
-    value += 10
+    digit =10
+    if (value%(digit*10))/10 <9:
+        value += digit
+        
 def up100back(channel):
     global value
-    value += 100
+    digit =100
+    if (value%(digit*10))/10 <9:
+        value += digit
     
 def up1000back(channel):
     global value
-    value += 1000
-    
+    digit =1000
+    if (value%(digit*10))/10 <9:
+        value += digit
+        
 def dn1back(channel):
     global value
-    value -= 1
+    digit = 1
+    if (value%(digit*10))/10 >0:
+        value -= digit
     
 def dn10back(channel):
     global value
-    value -= 10
+    digit = 10
+    if (value%(digit*10))/10 >0:
+        value -= digit
 def dn100back(channel):
     global value
-    value -= 100
+    digit = 100
+    if (value%(digit*10))/10 >0:
+        value -= digit
     
 def dn1000back(channel):
     global value
-    value -= 1000
+    digit = 1000
+    if (value%(digit*10))/10 >0:
+        value -= digit
 
 '''
 def process_GPIO(value):
@@ -204,7 +226,7 @@ def timer(num,togle=True):
 
 
 if __name__ == '__main__':
-    end = False
+    end_flag = False
     f = open('input.txt', 'r')
     input_list = []
     for line in f:
@@ -215,13 +237,12 @@ if __name__ == '__main__':
     display = init_hardware()
     index = 0
     init_monitor()
-
-    input_number(34)    
+    start = timeit.default_timer()
 
 try:
-    a=100
+    a=1000
     togle = 0
-    while not end:
+    while not end_flag:
         a-=1
         togle+=1
        # value = process_GPIO(value)
