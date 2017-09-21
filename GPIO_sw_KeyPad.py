@@ -18,12 +18,35 @@ from pygame.locals import *
 import RPi.GPIO as GPIO
 import time
 import ST7032I2C
-<<<<<<< HEAD
+from pad4pi import rpi_gpio
 import timeit
-=======
-import pad4pi
->>>>>>> 2224468a8dde65a2e6a4bf6927fe5dd06e7b61ec
 
+KEYPAD = [
+    [1,2,3],
+    [4,5,6],
+    [7,8,9],
+    [".",0,"←"],
+    ]
+ROW_PINS = [5,6,13,19] # 2,7,6,4 
+COL_PINS = [26,20,21] #3,1,5
+factory = rpi_gpio.KeypadFactory()
+keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS,col_pins=COL_PINS)
+digit = 10000
+def printKey(key):
+    global value,digit
+    if key == "←" or key == ".":
+        print(key,digit)
+        
+        value=int(value-int(value%(digit*10)/digit)*digit)
+        if digit<10000:
+            digit*=10
+    else:
+        if digit > 1:
+            digit=int(digit/10)
+        value=int(value-int(value%(digit*10)/digit)*digit+key*digit)
+        print(value," ",int(value%(digit*10)/digit)*digit," ",digit)
+
+keypad.registerKeyPressHandler(printKey)
 input_list = [123,1234,2345,4576,3543,6789]
 input_list.append(9999)
 def toggle_fullscreen():
@@ -60,34 +83,9 @@ def init_monitor(SW = 1024, SH = 768):
 def init_hardware():
     
     GPIO.setmode(GPIO.BCM)
-  
-    # setup input switches
-    GPIO.setup(12, GPIO.IN)
-    GPIO.setup(14, GPIO.IN)
-    GPIO.setup(15, GPIO.IN)
-    GPIO.setup(16, GPIO.IN)
     GPIO.setup(17, GPIO.IN)
-
-    GPIO.setup(22, GPIO.IN)
-    GPIO.setup(23, GPIO.IN)
-    GPIO.setup(24, GPIO.IN)
-    GPIO.setup(25, GPIO.IN)
-
-    # setup next switch
-    
-    # setup gpio interrupts
     # next button
-    GPIO.add_event_detect(12, GPIO.RISING, callback=next,bouncetime=100)
-    #
-    GPIO.add_event_detect(14, GPIO.RISING, callback=up1000back,bouncetime=100)
-    GPIO.add_event_detect(15, GPIO.RISING, callback=up100back,bouncetime=100)
-    GPIO.add_event_detect(16, GPIO.RISING, callback=up10back,bouncetime=100)
-    GPIO.add_event_detect(17, GPIO.RISING, callback=up1back,bouncetime=100)
-    
-    GPIO.add_event_detect(22, GPIO.RISING, callback=dn1000back,bouncetime=100)
-    GPIO.add_event_detect(23, GPIO.RISING, callback=dn100back,bouncetime=100)
-    GPIO.add_event_detect(24, GPIO.RISING, callback=dn10back,bouncetime=100)
-    GPIO.add_event_detect(25, GPIO.RISING, callback=dn1back,bouncetime=100)
+    GPIO.add_event_detect(17, GPIO.RISING, callback=next,bouncetime=100)
     
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
@@ -95,15 +93,18 @@ def init_hardware():
 
     return lcd
 
-
 def next(channel):
     print("next button pushed")
-    global index, start, end
+    global index, start, end, a, value, digit
     index += 1
     
     end = timeit.default_timer()
-    print("runtime", end - start)
+    print("runtime",end - start)
     start = timeit.default_timer()
+    a = 100
+    value = 0
+    digit = 1000
+    
 def up1back(channel):
     global value
     value += 1
@@ -200,7 +201,8 @@ if __name__ == '__main__':
     display = init_hardware()
     index = 0
     init_monitor()
-    start = timeit.default_timer()
+
+    start = timeit.default_timer()  
 
 try:
     a=100
@@ -234,4 +236,3 @@ try:
 
 except KeyboardInterrupt:
     GPIO.cleanup()
-
