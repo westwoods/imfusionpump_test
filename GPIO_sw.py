@@ -13,19 +13,15 @@
 # P25   DN .1
 
 import pygame
+import random
 from pygame.locals import *
 
 import RPi.GPIO as GPIO
 import time
 import ST7032I2C
-<<<<<<< HEAD
 import timeit
-=======
 import pad4pi
->>>>>>> 2224468a8dde65a2e6a4bf6927fe5dd06e7b61ec
 
-input_list = [123,1234,2345,4576,3543,6789]
-input_list.append(9999)
 def toggle_fullscreen():
     screen = pygame.display.get_surface()
     tmp = screen.convert()
@@ -98,8 +94,16 @@ def init_hardware():
 
 def next(channel):
     print("next button pushed")
+<<<<<<< HEAD
     global index, start, end, a, value
     index += 1
+=======
+    global index, input_list, start, end_flag, end
+    if index<len(input_list)-1:
+        index += 1
+    else:
+        end_flag = True
+>>>>>>> cd9a2ec31e934f64a85ff284a6c1a940a1626521
     
     end = timeit.default_timer()
     print("runtime", end - start)
@@ -109,33 +113,50 @@ def next(channel):
     
 def up1back(channel):
     global value
-    value += 1
+    digit = 1
+    if (value%(digit*10))/10 <9:
+        value += digit
     
 def up10back(channel):
     global value
-    value += 10
+    digit =10
+    if (value%(digit*10))/10 <9:
+        value += digit
+        
 def up100back(channel):
     global value
-    value += 100
+    digit =100
+    if (value%(digit*10))/10 <9:
+        value += digit
     
 def up1000back(channel):
     global value
-    value += 1000
-    
+    digit =1000
+    if (value%(digit*10))/10 <9:
+        value += digit
+        
 def dn1back(channel):
     global value
-    value -= 1
+    digit = 1
+    if (value%(digit*10))/10 >0:
+        value -= digit
     
 def dn10back(channel):
     global value
-    value -= 10
+    digit = 10
+    if (value%(digit*10))/10 >0:
+        value -= digit
 def dn100back(channel):
     global value
-    value -= 100
+    digit = 100
+    if (value%(digit*10))/10 >0:
+        value -= digit
     
 def dn1000back(channel):
     global value
-    value -= 1000
+    digit = 1000
+    if (value%(digit*10))/10 >0:
+        value -= digit
 
 '''
 def process_GPIO(value):
@@ -174,7 +195,21 @@ def input_number(num=34):
      
     screen.blit(text, textrect)
     clock.tick()
-    
+def print_screen(str="THANK YOU"):
+    # display the given number
+    screen = pygame.display.get_surface()
+
+    clock = pygame.time.Clock()
+    #print("before render", clock.get_time())
+
+    basicfont = pygame.font.SysFont(None, 48)
+    text = basicfont.render(str, True, (255, 0, 0), (255, 255, 255))
+    textrect = text.get_rect()
+    textrect.centerx = screen.get_rect().centerx
+    textrect.centery = screen.get_rect().centery
+     
+    screen.blit(text, textrect)
+    clock.tick()
 def timer(num,togle=True):
     # display the given number
     screen = pygame.display.get_surface()
@@ -199,6 +234,13 @@ def timer(num,togle=True):
 
 
 if __name__ == '__main__':
+    end_flag = False
+    f = open('input.txt', 'r')
+    input_list = []
+    for line in f:
+        print(line)
+        input_list.append(int(line))
+    random_index=random.sample(range(len(input_list)), len(input_list)) #random without duplicates
     value = 0
     display = init_hardware()
     index = 0
@@ -206,9 +248,9 @@ if __name__ == '__main__':
     start = timeit.default_timer()
 
 try:
-    a=100
+    a=1000
     togle = 0
-    while True:
+    while not end_flag:
         a-=1
         togle+=1
        # value = process_GPIO(value)
@@ -217,7 +259,7 @@ try:
         screen.fill((0,0,0))
         if a < 0:
             a = 0
-        input_number(input_list[index])
+        input_number(input_list[random_index[index]])
         if a==0:
             timer(a/10,togle%30>15)
         else:
@@ -234,6 +276,11 @@ try:
         
 
         time.sleep(.01)
+    screen = pygame.display.get_surface()
+    screen.fill((0,0,0))
+    print_screen()
+    pygame.display.update()
+    display.addstr("THANK YOU", 0)
 
 except KeyboardInterrupt:
     GPIO.cleanup()

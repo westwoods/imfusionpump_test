@@ -94,6 +94,7 @@ def init_hardware():
     # next button
     GPIO.add_event_detect(17, GPIO.RISING, callback=next,bouncetime=100)
     
+
     # initiaize lcd
     lcd = ST7032I2C.ST7032I(0x3e, 1)
     lcd.clear()
