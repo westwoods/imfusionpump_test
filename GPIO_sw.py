@@ -94,16 +94,11 @@ def init_hardware():
 
 def next(channel):
     print("next button pushed")
-<<<<<<< HEAD
-    global index, start, end, a, value
-    index += 1
-=======
-    global index, input_list, start, end_flag, end
+    global index, input_list, a,value,start, end_flag, end
     if index<len(input_list)-1:
         index += 1
     else:
         end_flag = True
->>>>>>> cd9a2ec31e934f64a85ff284a6c1a940a1626521
     
     end = timeit.default_timer()
     print("runtime", end - start)
