@@ -188,20 +188,11 @@ def loop_start():
 		print_screen()
 		pygame.display.update()
 		display.addstr("THANK YOU      ", 0)
-<<<<<<< HEAD
-		
 		for order in range(len(random_index)):
 			reorder_index=random_index.index(order)
 			print(reorder_index)
-			#data = str(reorder_index)+str(testNum_list[reorder_index])+str(input_list[reorder_index])+str(time_list[reorder_index])
-			#fw.write(data)
-=======
-		f = open('output.txt', 'w')
-		for order in range(len(random_index)):
-			reorder_index=random_index.index(order)
 			data = str(reorder_index)+str(testNum_list[reorder_index])+str(input_list[reorder_index])+str(time_list[reorder_index])
-			fw.write()
->>>>>>> b91305801afbaebe9c24ff8f439bf606f33f15c2
+			fw.write(data)
 		f.close()
 		fw.close()
 	except KeyboardInterrupt:
