@@ -76,7 +76,11 @@ def next(channel):
 		index += 1
 	else:
 		end_flag = True
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> b91305801afbaebe9c24ff8f439bf606f33f15c2
 	end = timeit.default_timer()
 	time_list.append(end - start)
 	input_list.append(value)
@@ -133,7 +137,6 @@ def update_val(delta = 0):
 		value = 9999
 	print("value:",value)
 
-
 end_flag = False
 f = open('input.txt', 'r')
 testNum_list = []
@@ -185,12 +188,20 @@ def loop_start():
 		print_screen()
 		pygame.display.update()
 		display.addstr("THANK YOU      ", 0)
+<<<<<<< HEAD
 		
 		for order in range(len(random_index)):
 			reorder_index=random_index.index(order)
 			print(reorder_index)
 			#data = str(reorder_index)+str(testNum_list[reorder_index])+str(input_list[reorder_index])+str(time_list[reorder_index])
 			#fw.write(data)
+=======
+		f = open('output.txt', 'w')
+		for order in range(len(random_index)):
+			reorder_index=random_index.index(order)
+			data = str(reorder_index)+str(testNum_list[reorder_index])+str(input_list[reorder_index])+str(time_list[reorder_index])
+			fw.write()
+>>>>>>> b91305801afbaebe9c24ff8f439bf606f33f15c2
 		f.close()
 		fw.close()
 	except KeyboardInterrupt:
