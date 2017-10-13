@@ -71,7 +71,7 @@ def init_hardware(next_button_pin=17):
 
 def next(channel):
 	print("next button pushed")
-	global index, input_list, a,value,start, end_flag, end,time_list,input_list
+	global index, input_list, a,value,start, end_flag, end,time_list,input_list,digit
 	if index<len(testNum_list)-1:
 		index += 1
 	else:
@@ -83,6 +83,7 @@ def next(channel):
 	start = timeit.default_timer()
 	a = 100
 	value = 0
+	digit = 10
 	
 def input_number(num=34):
 	# display the given number
