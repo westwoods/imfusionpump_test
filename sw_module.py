@@ -72,19 +72,14 @@ def init_hardware(next_button_pin=17):
 def next(channel):
 	print("next button pushed")
 	global index, input_list, a,value,start, end_flag, end,time_list,input_list
-	if index<len(input_list)-1:
+	if index<len(testNum_list)-1:
 		index += 1
 	else:
 		end_flag = True
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> b91305801afbaebe9c24ff8f439bf606f33f15c2
 	end = timeit.default_timer()
 	time_list.append(end - start)
 	input_list.append(value)
-	print("runtime", end - start)
+	print("runtime", end - start,end_flag,index,"  ",len(testNum_list))
 	start = timeit.default_timer()
 	a = 100
 	value = 0
@@ -94,7 +89,7 @@ def input_number(num=34):
 	screen = pygame.display.get_surface()
 	clock = pygame.time.Clock()
 	basicfont = pygame.font.SysFont(None, 48)
-	print('{:.3}'.format(float(num)/10))
+	print('{:.10}'.format(float(num)/10))
 	text = basicfont.render('{:.10}'.format(float(num)/10), True, (255, 0, 0), (255, 255, 255))
 	textrect = text.get_rect()
 	textrect.centerx = screen.get_rect().centerx
@@ -154,7 +149,7 @@ start = timeit.default_timer()
 digit = 10
 a=1000
 togle = 0
-def loop_start():
+def loop_start(digit_cursor = False):
 	global digit,value,f,time_list,end_flag,a,togle,index
 	fw = open('output.txt', 'w')
 	try:
@@ -176,9 +171,11 @@ def loop_start():
 			if value < 0:
 				value = 0
 			
-			sval = "Value: {:}".format(int(value/10))
+			sval = "Value: {:3}".format(int(value/10))
 			if digit==1 or (value%10 != 0):
 				sval = sval+"."+str( value%10)
+			if togle%30>15 or digit_cursor:
+				sval ='_' +sval[1:]
 			sval =sval+"           "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
 			
 			display.addstr(sval, 0)
@@ -188,10 +185,11 @@ def loop_start():
 		print_screen()
 		pygame.display.update()
 		display.addstr("THANK YOU      ", 0)
+		fw.write("[order] [testNum] [inputNum] [time]\n")
 		for order in range(len(random_index)):
 			reorder_index=random_index.index(order)
-			print(reorder_index)
-			data = str(reorder_index)+str(testNum_list[reorder_index])+str(input_list[reorder_index])+str(time_list[reorder_index])
+			print("reorder_index",reorder_index)
+			data = "{:0>4}    {:0>4}      {:0>4}       {:>.3} \n".format(order,testNum_list[order],input_list[reorder_index],time_list[reorder_index])
 			fw.write(data)
 		f.close()
 		fw.close()
