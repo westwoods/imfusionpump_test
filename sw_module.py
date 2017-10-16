@@ -100,6 +100,7 @@ def init_hardware(next_button_pin=17):
 	return lcd
 display = init_hardware()
 
+
 def input_number(num=34):
 	# display the given number
 	screen = pygame.display.get_surface()
