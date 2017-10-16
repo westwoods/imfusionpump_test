@@ -50,6 +50,7 @@ class c_Controller(threading.Thread):
 			if state!= last_state: #한번클릭시 메뉴가 여러번 넘어가지 않도록
 				print ("switch %d" %state)
 				last_state=state
+				print("in run")
 				if last_state==1:
 					print('pushed')
 			#delta = self.encoder.get_delta()

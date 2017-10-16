@@ -22,6 +22,19 @@ import ST7032I2C
 import timeit
 import pad4pi
 
+
+start_flag = False
+end_flag = False
+f = open('input.txt', 'r')
+testNum_list = []
+input_list = []
+time_list = []
+value = 0
+index = 0
+start = timeit.default_timer()
+digit = 10
+a=1000
+togle = 0
 def toggle_fullscreen():
 	screen = pygame.display.get_surface()
 	tmp = screen.convert()
@@ -52,7 +65,25 @@ def init_monitor(SW = 1024, SH = 768):
 	pygame.display.set_caption('Number Input Experiment')
 	screen.fill((0,0,0))
 	
-	
+init_monitor()
+
+def next_func(channel):
+	global start,index, input_list, a,value, end_flag, end,time_list,input_list,start_flag
+	print("next button pushed")
+	if  not start_flag:
+		start_flag = True
+	else:
+		if index<len(testNum_list)-1:
+			index += 1
+		else:
+			end_flag = True
+			end = timeit.default_timer()
+			time_list.append(end - start)
+			input_list.append(value)
+			print("runtime", end - start,end_flag,index,"  ",len(testNum_list))
+	start = timeit.default_timer()
+	a = 100
+	value = 0
 def init_hardware(next_button_pin=17):
 	GPIO.setmode(GPIO.BCM)
 	# setup input switches
@@ -61,29 +92,14 @@ def init_hardware(next_button_pin=17):
 	# setup next switch
 	# setup gpio interrupts
 	# next button
-	GPIO.add_event_detect(next_button_pin, GPIO.RISING, callback=next,bouncetime=300)
+	GPIO.add_event_detect(next_button_pin, GPIO.RISING, callback=next_func,bouncetime=300)
 	# initiaize lcd
 	lcd = ST7032I2C.ST7032I(0x3e, 1)
 	lcd.clear()
 
 	return lcd
+display = init_hardware()
 
-
-def next(channel):
-	print("next button pushed")
-	global index, input_list, a,value,start, end_flag, end,time_list,input_list
-	if index<len(testNum_list)-1:
-		index += 1
-	else:
-		end_flag = True
-	end = timeit.default_timer()
-	time_list.append(end - start)
-	input_list.append(value)
-	print("runtime", end - start,end_flag,index,"  ",len(testNum_list))
-	start = timeit.default_timer()
-	a = 100
-	value = 0
-	
 def input_number(num=34):
 	# display the given number
 	screen = pygame.display.get_surface()
@@ -96,7 +112,7 @@ def input_number(num=34):
 	textrect.centery = screen.get_rect().centery
 	screen.blit(text, textrect)
 	clock.tick()
-	
+
 def print_screen(str="THANK YOU"):
 	# display the given number
 	screen = pygame.display.get_surface()
@@ -109,7 +125,7 @@ def print_screen(str="THANK YOU"):
 	textrect.centery = screen.get_rect().centery
 	screen.blit(text, textrect)
 	clock.tick()
-	
+	pygame.display.update()
 def timer(num,togle=True):
 	# display the given number
 	screen = pygame.display.get_surface()
@@ -132,58 +148,52 @@ def update_val(delta = 0):
 		value = 9999
 	print("value:",value)
 
-end_flag = False
-f = open('input.txt', 'r')
-testNum_list = []
-input_list = []
-time_list = []
+
 for line in f:
 	print(line)
 	testNum_list.append(int(line))
 	random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
-value = 0
-display = init_hardware()
-index = 0
-init_monitor()
-start = timeit.default_timer()
-digit = 10
-a=1000
-togle = 0
+
+
 def loop_start(digit_cursor = False):
-	global digit,value,f,time_list,end_flag,a,togle,index
+	global digit,value,f,time_list,end_flag,a,togle,index,start_flag
 	fw = open('output.txt', 'w')
 	try:
 		while not end_flag:
-			a-=1
-			togle+=1
-		   # value = process_GPIO(value)
-			#pygame.display.flip() #지우는??
-			screen = pygame.display.get_surface()
-			screen.fill((0,0,0))
-			if a < 0:
-				a = 0
-			input_number(testNum_list[random_index[index]])
-			if a==0:
-				timer(a/10,togle%30>15)
+			if not start_flag:
+				screen = pygame.display.get_surface()
+				screen.fill((0,0,0))
+				print_screen("Press Next Button, If you ready")
+				display.addstr("PressNextButton", 0)
+				time.sleep(.6)
 			else:
-				timer(a/10,True)
-			pygame.display.update()
-			if value < 0:
-				value = 0
-			
-			sval = "Value: {:3}".format(int(value/10))
-			if digit==1 or (value%10 != 0):
-				sval = sval+"."+str( value%10)
-			if togle%30>15 or digit_cursor:
-				sval ='_' +sval[1:]
-			sval =sval+"           "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
-			
-			display.addstr(sval, 0)
-			time.sleep(.01)
+				a-=1
+				togle+=1
+			   # value = process_GPIO(value)
+				#pygame.display.flip() #지우는??
+				screen = pygame.display.get_surface()
+				screen.fill((0,0,0))
+				if a < 0:
+					a = 0
+				input_number(testNum_list[random_index[index]])
+				if a==0:
+					timer(a/10,togle%30>15)
+				else:
+					timer(a/10,True)
+				pygame.display.update()
+				if value < 0:
+					value = 0
+				sval = "Value: {:3}".format(int(value/10))
+				if digit==1 or (value%10 != 0):
+					sval = sval+"."+str( value%10)
+				if togle%30>15 or digit_cursor:
+					sval ='_' +sval[1:]
+				sval =sval+"           "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
+				display.addstr(sval, 0)
+				time.sleep(.01)
 		screen = pygame.display.get_surface()
 		screen.fill((0,0,0))
 		print_screen()
-		pygame.display.update()
 		display.addstr("THANK YOU      ", 0)
 		fw.write("[order] [testNum] [inputNum] [time]\n")
 		for order in range(len(random_index)):
