@@ -13,47 +13,46 @@
 # P25   DN .1
 import sw_module
 import RPi.GPIO as GPIO
-
+import time
 GPIO.setmode(GPIO.BCM)
 
 # setup input switches
-GPIO.setup(21, GPIO.IN)
-GPIO.setup(17, GPIO.IN)
-
 GPIO.setup(5, GPIO.IN)
+GPIO.setup(6, GPIO.IN)
 
 GPIO.setup(13, GPIO.IN)
-GPIO.setup(22, GPIO.IN)
 
+GPIO.setup(19, GPIO.IN)
 # setup next switch
 
 
-def up(channel):
-    sw_module.value += sw_module.digit
-    print("pushed up",sw_module.digit)
-def down(channel):
-    sw_module.value -= sw_module.digit
-    print("pushed down",sw_module.digit)
-def left(channel):
-    if sw_module.digit < 1000:
-        sw_module.digit *=10
-    
-def right(channel):
-    global digit
-    if sw_module.digit > 1:
-        sw_module.digit = int(sw_module.digit/10)
-        
+def swc_callback(channel):
+	time.sleep(0.08)
+	if  GPIO.input(channel)==0:
+		sw_module.play_click()
+		if channel == 6:
+			if (sw_module.value%(sw_module.digit*10))/sw_module.digit <9:
+				sw_module.value += sw_module.digit
+			print("pushed up",sw_module.digit)
+		if channel == 19:
+			if (sw_module.value%(sw_module.digit*10))/sw_module.digit >0:
+				sw_module.value -= sw_module.digit
+			print("pushed down",sw_module.digit)
+		if channel == 13:
+			if sw_module.digit<1000:
+				sw_module.digit *=10
+		if channel == 5:
+			if sw_module.digit>1:
+				sw_module.digit = int(sw_module.digit/10)
+
 # setup gpio interrupts
-GPIO.add_event_detect(21, GPIO.RISING, callback=up,bouncetime=100)
+GPIO.add_event_detect(6, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 
-GPIO.add_event_detect(22, GPIO.RISING, callback=down,bouncetime=100)
+GPIO.add_event_detect(19, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 
-GPIO.add_event_detect(5, GPIO.RISING, callback=left,bouncetime=100)
+GPIO.add_event_detect(13, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 
-GPIO.add_event_detect(13, GPIO.RISING, callback=right,bouncetime=100)
+GPIO.add_event_detect(5, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 
-    
-
-    
 print("start")
-sw_module.loop_start()
+sw_module.loop_start(True)

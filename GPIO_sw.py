@@ -13,77 +13,78 @@
 # P25   DN .1
 
 import sw_module
-    
-def init_hardware():
-    
-    GPIO.setmode(GPIO.BCM)
-  
-    # setup input switches
-    GPIO.setup(12, GPIO.IN)
-    GPIO.setup(14, GPIO.IN)
-    GPIO.setup(15, GPIO.IN)
-    GPIO.setup(16, GPIO.IN)
-    
-    GPIO.setup(22, GPIO.IN)
-    GPIO.setup(23, GPIO.IN)
-    GPIO.setup(24, GPIO.IN)
-    GPIO.setup(25, GPIO.IN)
-    
-    # setup gpio interrupts
-    # next button
-    GPIO.add_event_detect(14, GPIO.RISING, callback=up1000back,bouncetime=100)
-    GPIO.add_event_detect(15, GPIO.RISING, callback=up100back,bouncetime=100)
-    GPIO.add_event_detect(16, GPIO.RISING, callback=up10back,bouncetime=100)
-    GPIO.add_event_detect(12, GPIO.RISING, callback=up1back,bouncetime=100)
-    
-    GPIO.add_event_detect(22, GPIO.RISING, callback=dn1000back,bouncetime=100)
-    GPIO.add_event_detect(23, GPIO.RISING, callback=dn100back,bouncetime=100)
-    GPIO.add_event_detect(24, GPIO.RISING, callback=dn10back,bouncetime=100)
-    GPIO.add_event_detect(25, GPIO.RISING, callback=dn1back,bouncetime=100)
-    
-    # initiaize lcd
-    lcd = ST7032I2C.ST7032I(0x3e, 1)
-    lcd.clear()
+import time
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
 
-    return lcd
+# setup input switches
+GPIO.setup(5, GPIO.IN)
+GPIO.setup(6, GPIO.IN)
+GPIO.setup(13, GPIO.IN)
+GPIO.setup(19, GPIO.IN)
 
-def up1back(channel):
-    digit = 1
-    if (sw_module.value%(digit*10))/10 <9:
-        sw_module.value += digit
-    
-def up10back(channel):
-    digit =10
-    if (sw_module.value%(digit*10))/10 <9:
-        sw_module.value += digit
-        
-def up100back(channel):
-    digit =100
-    if (sw_module.value%(digit*10))/10 <9:
-        sw_module.value += digit
-    
-def up1000back(channel):
-    digit =1000
-    if (sw_module.value%(digit*10))/10 <9:
-        sw_module.value += digit
-        
-def dn1back(channel):
-    digit = 1
-    if (sw_module.value%(digit*10))/10 >0:
-        sw_module.value -= digit
-    
-def dn10back(channel):
-    digit = 10
-    if (sw_module.value%(digit*10))/10 >0:
-        sw_module.value -= digit
-def dn100back(channel):
-    digit = 100
-    if (sw_module.value%(digit*10))/10 >0:
-        sw_module.value -= digit
-    
-def dn1000back(channel):
-    digit = 1000
-    if (sw_module.value%(digit*10))/10 >0:
-        sw_module.value -= digit
+GPIO.setup(26, GPIO.IN)
+GPIO.setup(16, GPIO.IN)
+GPIO.setup(20, GPIO.IN)
+GPIO.setup(21, GPIO.IN)
+
+def swc_callback(channel):
+	time.sleep(0.08)
+	if  GPIO.input(channel)==0:
+		sw_module.play_click()
+		if channel == 5:
+			digit = 1
+			if (sw_module.value%(digit*10))/digit <9:
+				sw_module.value += digit
+			
+			
+		if channel == 6:
+			digit =10
+			if (sw_module.value%(digit*10))/digit <9:
+				sw_module.value += digit
+				
+		if channel == 13:
+			digit =100
+			print((sw_module.value%(digit*10))/digit)
+			if (sw_module.value%(digit*10))/digit <9:
+				sw_module.value += digit
+				
+		if channel == 19:
+			digit =1000
+			if (sw_module.value%(digit*10))/digit <9:
+				sw_module.value += digit
+		if channel == 26:
+			digit = 1
+			if (sw_module.value%(digit*10))/digit >0:
+				sw_module.value -= digit
+		
+		if channel == 16:
+			digit = 10
+			if (sw_module.value%(digit*10))/digit >0:
+				sw_module.value -= digit
+				
+		if channel == 20:
+			digit = 100
+			if (sw_module.value%(digit*10))/digit >0:
+				sw_module.value -= digit
+				
+		if channel == 21:
+			digit = 1000
+			if (sw_module.value%(digit*10))/digit >0:
+				sw_module.value -= digit
+		print(digit)
+
+# setup gpio interrupts
+GPIO.add_event_detect(5, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(6, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(13, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(19, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+
+GPIO.add_event_detect(26, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(16, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(20, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+GPIO.add_event_detect(21, GPIO.BOTH, callback=swc_callback,bouncetime=10)
+
+
 print("start")
-sw_module.loop_start()
+sw_module.loop_start(sw_digit_mode = True)
