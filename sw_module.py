@@ -44,7 +44,7 @@ togle = 0
 def play_click(song_num=0):
 	click[song_num].stop()
 	print("async play")
-	time = 150 if song_num == 0 else 300
+	time = 200 if song_num == 0 else 350
 	click[song_num].play(maxtime=time)
 
 def count_down(song_num=2):
