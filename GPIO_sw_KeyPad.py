@@ -43,5 +43,5 @@ def printKey(key):
 			sw_module.value=int(sw_module.value-sw_module.value%(sw_module.digit*10)+sw_module.value%(sw_module.digit)+key*sw_module.digit)
 		
 keypad.registerKeyPressHandler(printKey)
-sw_module.loop_start()
+sw_module.loop_start(test_thing="K")
 

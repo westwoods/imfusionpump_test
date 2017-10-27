@@ -55,4 +55,4 @@ GPIO.add_event_detect(13, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 GPIO.add_event_detect(5, GPIO.BOTH, callback=swc_callback,bouncetime=100)
 
 print("start")
-sw_module.loop_start(True)
+sw_module.loop_start(test_thing="F",sw_4dir_mode=True)

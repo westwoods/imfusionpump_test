@@ -25,12 +25,12 @@ import concurrent.futures
 import math
 pygame.mixer.init()
 
-click= [pygame.mixer.Sound("click_sound1.wav"),pygame.mixer.Sound("click_sound2.wav"),pygame.mixer.Sound("Ticking_Clock.wav")]
-
-
+click= [pygame.mixer.Sound("/home/pi/imfusionpump_test/click_sound1.wav"),pygame.mixer.Sound("/home/pi/imfusionpump_test/click_sound2.wav"),pygame.mixer.Sound("/home/pi/imfusionpump_test/Ticking_Clock.wav")]
+test_name = input("input test#")
+test_name = "S"+test_name
 start_flag = False
 end_flag = False
-f = open('input.txt', 'r')
+f = open('/home/pi/imfusionpump_test/input.txt', 'r')
 testNum_list = []
 input_list = []
 time_list = []
@@ -44,7 +44,7 @@ togle = 0
 def play_click(song_num=0):
 	click[song_num].stop()
 	print("async play")
-	time = 200 if song_num == 0 else 350
+	time = 150 if song_num == 0 else 300
 	click[song_num].play(maxtime=time)
 
 def count_down(song_num=2):
@@ -78,7 +78,7 @@ def toggle_fullscreen():
 
 def init_monitor(SW = 1024, SH = 768):
 	pygame.init()
-	screen = pygame.display.set_mode((SW,SH))
+	screen = pygame.display.set_mode((SW,SH),FULLSCREEN)
 	pygame.display.set_caption('Number Input Experiment')
 	screen.fill((0,0,0))
 
@@ -86,7 +86,7 @@ init_monitor()
 
 def next_func(channel):
 	time.sleep(0.08)
-	count_down()
+	#count_down()
 	if GPIO.input(channel)==0:
 		play_click(1)
 		global start,index, input_list, a,value, end_flag, end,time_list,input_list,start_flag,digit
@@ -103,7 +103,7 @@ def next_func(channel):
 			input_list.append(value)
 			print("runtime", end - start,end_flag,index,"  ",len(testNum_list))
 		start = timeit.default_timer()
-		a = 100
+		a = 300
 		digit = 10
 		value = 0
 def init_hardware(next_button_pin=17):
@@ -127,8 +127,8 @@ def input_number(num=34):
 	# display the given number
 	screen = pygame.display.get_surface()
 	clock = pygame.time.Clock()
-	basicfont = pygame.font.SysFont(None, 48)
-	text = basicfont.render('{:.10}'.format(float(num)/10), True, (255, 0, 0), (255, 255, 255))
+	basicfont = pygame.font.SysFont(None, 255)
+	text = basicfont.render('{:0.0f}'.format(float(num)/10), True, (255, 0, 0), (255, 255, 255))
 	textrect = text.get_rect()
 	textrect.centerx = screen.get_rect().centerx
 	textrect.centery = screen.get_rect().centery
@@ -140,7 +140,7 @@ def print_screen(str="THANK YOU"):
 	screen = pygame.display.get_surface()
 	clock = pygame.time.Clock()
 	#print("before render", clock.get_time())
-	basicfont = pygame.font.SysFont(None, 48)
+	basicfont = pygame.font.SysFont(None, 60)
 	text = basicfont.render(str, True, (255, 0, 0), (255, 255, 255))
 	textrect = text.get_rect()
 	textrect.centerx = screen.get_rect().centerx
@@ -173,13 +173,15 @@ def update_val(delta = 0):
 
 for line in f:
 	print(line)
-	testNum_list.append(int(line))
+	testNum_list.append(int(float(line)*10))
 	random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
 
 
-def loop_start(sw_4dir_mode = False, sw_digit_mode = False):
-	global digit,value,f,time_list,end_flag,a,togle,index,start_flag
-	fw = open('output.txt', 'w')
+def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
+	global digit,value,f,time_list,end_flag,a,togle,index,start_flag,test_name
+	now_time=time.localtime()
+	now_time=time.strftime(" %H:%M:%S")
+	fw = open("/home/pi/imfusionpump_test/Output"+"/"+test_thing+" "+test_name+now_time, 'w')
 	try:
 		while not end_flag:
 			if not start_flag:

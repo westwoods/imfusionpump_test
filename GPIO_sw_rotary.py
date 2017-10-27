@@ -1,5 +1,4 @@
-
-#! /usr/bin/python3
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -63,7 +62,7 @@ class c_Controller(threading.Thread):
 			if direction !=0:
 				if abs(delta)>=20:#빠른 회전
 					print ("rotate:",delta)
-					sw_module.update_val(delta*abs(delta)/20)
+					sw_module.update_val(delta*abs(delta)/2)
 				elif abs(delta)>=5: #중간회전
 					self.count[1]+=1
 					print ("self.count",self.count)
@@ -83,4 +82,4 @@ print("start")
 controller=c_Controller()
 controller.daemon =True
 controller.start()
-sw_module.loop_start()
+sw_module.loop_start(test_thing="R")

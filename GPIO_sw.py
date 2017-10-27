@@ -32,24 +32,24 @@ def swc_callback(channel):
 	time.sleep(0.08)
 	if  GPIO.input(channel)==0:
 		sw_module.play_click()
-		if channel == 5:
+		if channel == 19:
 			digit = 1
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
 			
 			
-		if channel == 6:
+		if channel == 21:
 			digit =10
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
 				
-		if channel == 13:
+		if channel == 20:
 			digit =100
 			print((sw_module.value%(digit*10))/digit)
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
 				
-		if channel == 19:
+		if channel == 5:
 			digit =1000
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
@@ -63,12 +63,12 @@ def swc_callback(channel):
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
 				
-		if channel == 20:
+		if channel == 13:
 			digit = 100
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
 				
-		if channel == 21:
+		if channel == 6:
 			digit = 1000
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
@@ -87,4 +87,4 @@ GPIO.add_event_detect(21, GPIO.BOTH, callback=swc_callback,bouncetime=10)
 
 
 print("start")
-sw_module.loop_start(sw_digit_mode = True)
+sw_module.loop_start(test_thing="D",sw_digit_mode = True)
