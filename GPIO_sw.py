@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -29,7 +29,7 @@ GPIO.setup(20, GPIO.IN)
 GPIO.setup(21, GPIO.IN)
 
 def swc_callback(channel):
-	time.sleep(0.08)
+	time.sleep(0.02)
 	if  GPIO.input(channel)==0:
 		sw_module.play_click()
 		if channel == 19:

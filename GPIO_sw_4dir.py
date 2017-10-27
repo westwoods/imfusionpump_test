@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -11,9 +11,10 @@
 # P23   DN 10
 # P24   DN 1
 # P25   DN .1
-import sw_module
 import RPi.GPIO as GPIO
 import time
+
+import sw_module
 GPIO.setmode(GPIO.BCM)
 
 # setup input switches
@@ -46,13 +47,13 @@ def swc_callback(channel):
 				sw_module.digit = int(sw_module.digit/10)
 
 # setup gpio interrupts
-GPIO.add_event_detect(6, GPIO.BOTH, callback=swc_callback,bouncetime=100)
+GPIO.add_event_detect(6, GPIO.BOTH, callback=swc_callback,bouncetime=30)
 
-GPIO.add_event_detect(19, GPIO.BOTH, callback=swc_callback,bouncetime=100)
+GPIO.add_event_detect(19, GPIO.BOTH, callback=swc_callback,bouncetime=30)
 
-GPIO.add_event_detect(13, GPIO.BOTH, callback=swc_callback,bouncetime=100)
+GPIO.add_event_detect(13, GPIO.BOTH, callback=swc_callback,bouncetime=30)
 
-GPIO.add_event_detect(5, GPIO.BOTH, callback=swc_callback,bouncetime=100)
+GPIO.add_event_detect(5, GPIO.BOTH, callback=swc_callback,bouncetime=30)
 
 print("start")
 sw_module.loop_start(test_thing="F",sw_4dir_mode=True)

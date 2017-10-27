@@ -20,7 +20,7 @@ import sw_module
 import time
 import threading
 #import m_Controller.rotary_encoder as Rotary
-rotary_input_q=[0,0,0,0,0]
+rotary_input_q=[0,0,0,0,0,0,0,0,0,0,0,0,]
 index=0
 
 
@@ -53,29 +53,39 @@ class c_Controller(threading.Thread):
 				if last_state==1:
 					print('pushed')
 			#delta = self.encoder.get_delta()
-			rotary_input_q[index]=direction
-			index=(index+1)%5
-			if sum(rotary_input_q) >0:
-				delta=sum([abs(x) for  x in rotary_input_q])
-			else:
-				delta=-sum([abs(x) for  x in rotary_input_q])
 			if direction !=0:
-				if abs(delta)>=20:#빠른 회전
-					print ("rotate:",delta)
-					sw_module.update_val(delta*abs(delta)/2)
-				elif abs(delta)>=5: #중간회전
+				rotary_input_q[index]= direction
+				
+				if sum(rotary_input_q) >0:
+					delta=sum([abs(x) for  x in rotary_input_q])
+				else:
+					delta=-sum([abs(x) for  x in rotary_input_q])
+								
+				if abs(delta)>=10: #중간회전
+					print(rotary_input_q)
+					self.count[2]+=1
+					#print ("self.count",self.count)
+					if self.count[2]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta)*100)
+				elif abs(delta)>=2: #중간회전
+					print(rotary_input_q)
 					self.count[1]+=1
-					print ("self.count",self.count)
-					if self.count[1]>=4:
-						self.count[1]=0
-						sw_module.update_val(delta)
+					#print ("self.count",self.count)
+					if self.count[1]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta)*10)
 				else: #느린회전
+					print(rotary_input_q)
 					self.count[0]+=1
-					print ("self.count",self.count)
-					if self.count[0]>=4:
-						self.count[0]=0
-						sw_module.update_val(direction/abs(direction))
-			time.sleep(0.01)
+					#print ("self.count",self.count)
+					if self.count[0]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta))
+			else:
+				rotary_input_q[index]=0
+			index=(index+1)%5
+			time.sleep(0.03)
 print("noew")
 print("start")
 

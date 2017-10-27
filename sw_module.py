@@ -44,14 +44,14 @@ togle = 0
 def play_click(song_num=0):
 	click[song_num].stop()
 	print("async play")
-	time = 150 if song_num == 0 else 300
-	click[song_num].play(maxtime=time)
+	time = 350 if song_num == 0 else 300
+	click[song_num].play()
 
 def count_down(song_num=2):
 	click[song_num].stop()
 	print("async play")
 	time = 15000
-	click[song_num].play(maxtime=time)
+	click[song_num].play()
 
 def toggle_fullscreen():
 	screen = pygame.display.get_surface()
@@ -78,14 +78,14 @@ def toggle_fullscreen():
 
 def init_monitor(SW = 1024, SH = 768):
 	pygame.init()
-	screen = pygame.display.set_mode((SW,SH),FULLSCREEN)
+	screen = pygame.display.set_mode((SW,SH),)#FULLSCREEN)
 	pygame.display.set_caption('Number Input Experiment')
 	screen.fill((0,0,0))
 
 init_monitor()
 
 def next_func(channel):
-	time.sleep(0.08)
+	time.sleep(0.02)
 	#count_down()
 	if GPIO.input(channel)==0:
 		play_click(1)
@@ -114,7 +114,7 @@ def init_hardware(next_button_pin=17):
 	# setup next switch
 	# setup gpio interrupts
 	# next button
-	GPIO.add_event_detect(next_button_pin, GPIO.BOTH, callback=next_func,bouncetime=100)
+	GPIO.add_event_detect(next_button_pin, GPIO.BOTH, callback=next_func,bouncetime=170)
 	# initiaize lcd
 	lcd = ST7032I2C.ST7032I(0x3e, 1)
 	lcd.clear()
@@ -128,7 +128,10 @@ def input_number(num=34):
 	screen = pygame.display.get_surface()
 	clock = pygame.time.Clock()
 	basicfont = pygame.font.SysFont(None, 255)
-	text = basicfont.render('{:0.0f}'.format(float(num)/10), True, (255, 0, 0), (255, 255, 255))
+	outnum = "{:3}".format(int(num/10)) # 5white space
+	if digit==1 or (num%10 != 0):
+		outnum = outnum+"."+str( num%10)
+	text = basicfont.render(outnum, True, (255, 0, 0), (255, 255, 255))
 	textrect = text.get_rect()
 	textrect.centerx = screen.get_rect().centerx
 	textrect.centery = screen.get_rect().centery
@@ -174,6 +177,7 @@ def update_val(delta = 0):
 for line in f:
 	print(line)
 	testNum_list.append(int(float(line)*10))
+	print(testNum_list)
 	random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
 
 
@@ -225,7 +229,7 @@ def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
 						sval = sval+"."+str( value%10)
 					sval =sval+"           "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
 					display.addstr(sval, 0)
-				time.sleep(.01)
+				time.sleep(.001)
 		screen = pygame.display.get_surface()
 		screen.fill((0,0,0))
 		print_screen()
@@ -236,6 +240,8 @@ def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
 			print("reorder_index",reorder_index , "order", order,len(input_list), len(testNum_list))
 			data = "{:0>4}    {:0>4}      {:0>4}       {:>.3} \n".format(order,testNum_list[order],input_list[reorder_index],time_list[reorder_index])
 			fw.write(data)
+			
+		fw.write( "sum:{:>.3f}\n".format(sum(time_list)))
 		f.close()
 		fw.close()
 	except KeyboardInterrupt:
