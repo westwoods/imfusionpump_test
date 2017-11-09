@@ -44,7 +44,7 @@ togle = 0
 def play_click(song_num=0):
 	click[song_num].stop()
 	print("async play")
-	time = 350 if song_num == 0 else 300
+	time = 150 if song_num == 0 else 300
 	click[song_num].play()
 
 def count_down(song_num=2):
@@ -85,7 +85,6 @@ def init_monitor(SW = 1024, SH = 768):
 init_monitor()
 
 def next_func(channel):
-	time.sleep(0.02)
 	#count_down()
 	if GPIO.input(channel)==0:
 		play_click(1)
@@ -114,7 +113,7 @@ def init_hardware(next_button_pin=17):
 	# setup next switch
 	# setup gpio interrupts
 	# next button
-	GPIO.add_event_detect(next_button_pin, GPIO.BOTH, callback=next_func,bouncetime=170)
+	GPIO.add_event_detect(next_button_pin, GPIO.FALLING, callback=next_func,bouncetime=300)
 	# initiaize lcd
 	lcd = ST7032I2C.ST7032I(0x3e, 1)
 	lcd.clear()
@@ -173,19 +172,26 @@ def update_val(delta = 0):
 		value = 9999
 	print("value:",value)
 
-
-for line in f:
-	print(line)
-	testNum_list.append(int(float(line)*10))
-	print(testNum_list)
-	random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
+if test_name == "St":
+	for line in range(0,10):
+			print(line)
+			testNum_list.append(random.randint(1,1999))
+			print(testNum_list)
+			random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
+else:
+	for line in f:
+		print(line)
+		testNum_list.append(int(float(line)*10))
+		print(testNum_list)
+		random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
 
 
 def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
 	global digit,value,f,time_list,end_flag,a,togle,index,start_flag,test_name
 	now_time=time.localtime()
 	now_time=time.strftime(" %H:%M:%S")
-	fw = open("/home/pi/imfusionpump_test/Output"+"/"+test_thing+" "+test_name+now_time, 'w')
+	if not test_name == "St":
+		fw = open("/home/pi/Desktop/"+test_thing+"/"+test_thing+test_name+now_time, 'w')
 	try:
 		while not end_flag:
 			if not start_flag:
@@ -241,9 +247,10 @@ def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
 			data = "{:0>4}    {:0>4}      {:0>4}       {:>.3} \n".format(order,testNum_list[order],input_list[reorder_index],time_list[reorder_index])
 			fw.write(data)
 			
-		fw.write( "sum:{:>.3f}\n".format(sum(time_list)))
+		if not test_name == "St":
+			fw.write( "sum:{:>.3f}\n".format(sum(time_list)))
+			fw.close()
 		f.close()
-		fw.close()
 	except KeyboardInterrupt:
 		f.close()
 		fw.close()

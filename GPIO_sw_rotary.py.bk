@@ -42,9 +42,6 @@ class c_Controller(threading.Thread):
 		sys.exit(1)
 	def run(self):
 		global index
-		count = 0
-		count10 = 0
-		count100 = 0
 		last_state= 0
 		while True :
 			direction = self.encoder.get_steps()
@@ -56,31 +53,39 @@ class c_Controller(threading.Thread):
 				if last_state==1:
 					print('pushed')
 			#delta = self.encoder.get_delta()
-			if abs(direction) == 1:
+			if direction !=0:
 				rotary_input_q[index]= direction
-				count = count + direction
-				if abs(count) > 3:
-					sw_module.update_val(count/4)
-					count = 0
-			elif direction !=0 and abs(sum(rotary_input_q)) <=5:
-				rotary_input_q[index]= direction
-				sw_module.update_val(direction/2)
-			elif direction !=0 and abs(sum(rotary_input_q)) >5 and abs(sum(rotary_input_q)) <=10:
-				rotary_input_q[index]= direction
-				count10 = count10 + direction
-				if abs(count10) > 5:
-					sw_module.update_val(count10/abs(count10)*10)
-					count10 = 0
-			elif direction !=0:
-				rotary_input_q[index]= direction
-				count100 = count100 + direction
-				if abs(count100) > 10:
-					sw_module.update_val(count100/abs(count100)*100)
-					count100 = 0
+				
+				if sum(rotary_input_q) >0:
+					delta=sum([abs(x) for  x in rotary_input_q])
+				else:
+					delta=-sum([abs(x) for  x in rotary_input_q])
+								
+				if abs(delta)>=10: #중간회전
+					print(rotary_input_q)
+					self.count[2]+=1
+					#print ("self.count",self.count)
+					if self.count[2]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta)*100)
+				elif abs(delta)>=2: #중간회전
+					print(rotary_input_q)
+					self.count[1]+=1
+					#print ("self.count",self.count)
+					if self.count[1]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta)*10)
+				else: #느린회전
+					print(rotary_input_q)
+					self.count[0]+=1
+					#print ("self.count",self.count)
+					if self.count[0]>=2:
+						self.count=[0,0,0]
+						sw_module.update_val(delta/abs(delta))
 			else:
 				rotary_input_q[index]=0
 			index=(index+1)%5
-			time.sleep(0.01)
+			time.sleep(0.03)
 print("noew")
 print("start")
 
