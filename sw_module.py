@@ -78,7 +78,7 @@ def toggle_fullscreen():
 
 def init_monitor(SW = 1024, SH = 768):
 	pygame.init()
-	screen = pygame.display.set_mode((SW,SH),)#FULLSCREEN)
+	screen = pygame.display.set_mode((SW,SH))#,FULLSCREEN)
 	pygame.display.set_caption('Number Input Experiment')
 	screen.fill((0,0,0))
 
@@ -170,7 +170,7 @@ def update_val(delta = 0):
 		value = 0
 	if value > 9999:
 		value = 9999
-	print("value:",value)
+	#print("value:",value)
 
 if test_name == "St":
 	for line in range(0,10):

@@ -25,7 +25,6 @@ GPIO.setup(13,GPIO.IN)
 GPIO.setup(19,GPIO.IN)
 # setup next switch
 
-
 def swc_callback(channel):
     time.sleep(0.08)
     if  GPIO.input(channel)==0:
@@ -33,10 +32,14 @@ def swc_callback(channel):
         if channel == 6:
             if (sw_module.value%(sw_module.digit*10))/sw_module.digit <9:
                 sw_module.value += sw_module.digit
+            elif (sw_module.value%(sw_module.digit*10))/sw_module.digit == 9:
+                sw_module.value -= sw_module.digit*9
             print("pushed up",sw_module.digit)
         if channel == 19:
             if (sw_module.value%(sw_module.digit*10))/sw_module.digit >0:
                 sw_module.value -= sw_module.digit
+            elif (sw_module.value%(sw_module.digit*10))/sw_module.digit == 0:
+                sw_module.value += sw_module.digit*9
             print("pushed down",sw_module.digit)
         if channel == 13:
             if sw_module.digit<1000:

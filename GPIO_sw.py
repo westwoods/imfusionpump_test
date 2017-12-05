@@ -36,42 +36,51 @@ def swc_callback(channel):
 			digit = 1
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
-			
-			
+			elif (sw_module.value%(digit*10))/digit == 9:
+				sw_module.value -= digit*9
 		if channel == 21:
 			digit =10
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
 				
-		if channel == 20:
+			elif (sw_module.value%(digit*10))/digit == 9:
+				sw_module.value -= digit*9== 20:
 			digit =100
 			print((sw_module.value%(digit*10))/digit)
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
-				
+			elif (sw_module.value%(digit*10))/digit == 9:
+				sw_module.value -= digit*9
 		if channel == 5:
 			digit =1000
 			if (sw_module.value%(digit*10))/digit <9:
 				sw_module.value += digit
+			elif (sw_module.value%(digit*10))/digit == 9:
+				sw_module.value -= digit*9
 		if channel == 26:
 			digit = 1
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
-		
+			elif (sw_module.value%(digit*10))/digit == 0:
+				sw_module.value += digit*9
 		if channel == 16:
 			digit = 10
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
-				
+			elif (sw_module.value%(digit*10))/digit == 0:
+				sw_module.value += digit*9
 		if channel == 13:
 			digit = 100
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
-				
+			elif (sw_module.value%(digit*10))/digit == 0:
+				sw_module.value += digit*9
 		if channel == 6:
 			digit = 1000
 			if (sw_module.value%(digit*10))/digit >0:
 				sw_module.value -= digit
+			elif (sw_module.value%(digit*10))/digit == 0:
+				sw_module.value += digit*9
 		print(digit)
 
 # setup gpio interrupts
