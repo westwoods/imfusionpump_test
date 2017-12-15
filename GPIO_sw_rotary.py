@@ -21,7 +21,7 @@ import time
 import threading
 import math
 #import m_Controller.rotary_encoder as Rotary
-rotary_input_q=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,]
+rotary_input_q=[0,0,0,0,0,0,0,0,0,0,0,0,]
 index=0
 
 
@@ -41,11 +41,15 @@ class c_Controller(threading.Thread):
 		print ('turn off')
 	
 		sys.exit(1)
-		
 	def run(self):
 		global index
-		capture = -1
-		cnt = 0
+		count = 0
+		count10 = 0
+		count100 = 0
+		captureValue = -1
+		sumOfinputQ = 0
+		level1 = 9000
+		level2 = 21000
 		while True :
 			direction = self.encoder.get_steps()
 			#delta = self.encoder.get_delta()
@@ -59,28 +63,43 @@ class c_Controller(threading.Thread):
 				if sum(rotary_input_q):
 					print(0,abs(sum(rotary_input_q))*100,50000/(sw_module.value+1),"*"*abs(sum(rotary_input_q)))
 			"""
-			rotary_input_q[index]= direction
-			if not all(v==0 for v in rotary_input_q):
-				if capture == -1:
-					capture = sw_module.value
-				if direction !=0:
-					cnt = cnt + 1
-					delta = abs(capture-sw_module.value)
-					if cnt > (math.log(delta+1)+2):
-						cnt = 0
-						if ( delta<10):
-							sw_module.update_val(direction/abs(direction))
-						elif delta <100:
-							sw_module.update_val((-sw_module.value%10)+direction/abs(direction)*10)
-						elif delta <1000:
-							sw_module.update_val((-sw_module.value%100)+direction/abs(direction)*100)
-						elif delta <10000:
-							sw_module.update_val((-sw_module.value%1000)+direction/abs(direction)*1000)
-						print((rotary_input_q), direction, capture,(math.log(delta+1)+1))
+			###
+			if direction !=0: #input rotary encoder
+				if captureValue == -1:
+					captureValue = sw_module.value
+				if abs(sum(rotary_input_q)*100) <= level1/(math.log(sw_module.value+100)+2): #low speed
+					rotary_input_q[index]= direction
+					count = count + direction
+					if abs(count) > 3:
+						sw_module.update_val(count/abs(count))
+						print(1,abs(sum(rotary_input_q)))
+						count = 0
+				elif direction !=0 and abs(sum(rotary_input_q*100)) >level1/(math.log(sw_module.value+100)+2) and abs(sum(rotary_input_q)*100) <=level2/(math.log(sw_module.value+100)+2): #mid speed
+					rotary_input_q[index]= direction 
+					count10 = count10 + direction
+					if abs(count10) > 2:
+						sw_module.update_val(count10/abs(count10)*10)
+						count10 = 0
+						print(2,abs(sum(rotary_input_q)))
+				elif direction !=0: #high speed
+					rotary_input_q[index]= direction
+					count100 = count100 + direction
+					if abs(count100) > 2:
+						sw_module.update_val(count100/abs(count100)*100)
+						count100 = 0
+						print(3,abs(sum(rotary_input_q)))
+				sumOfinputQ = sumOfinputQ + sum(rotary_input_q) #integral 
 			else:
-				print((rotary_input_q), direction, capture,sw_module.value)
-				capture = -1
-			index=(index+1)%30
+				
+				if abs(sumOfinputQ)>20 and abs(sumOfinputQ)<200:
+					sw_module.value = captureValue+ int(sumOfinputQ/abs(sumOfinputQ)*10)
+					#print(3,abs(sum(rotary_input_q))*100,level1/(math.log(sw_module.value+1)+1),"*"*abs(sum(rotary_input_q)))
+				#print(sumOfinputQ)
+				if index == 0:
+					captureValue = -1
+					sumOfinputQ = 0
+				rotary_input_q[index]=0
+			index=(index+1)%10
 			time.sleep(0.01)
 print("noew")
 print("start")
@@ -88,4 +107,4 @@ print("start")
 controller=c_Controller()
 controller.daemon =True
 controller.start()
-sw_module.loop_start(test_thing="R")
+sw_module.loop_start(test_thing="R",sw_rotary_mode = True)

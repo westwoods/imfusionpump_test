@@ -186,7 +186,7 @@ else:
 		random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
 
 
-def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
+def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False,sw_rotary_mode = False):
 	global digit,value,f,time_list,end_flag,a,togle,index,start_flag,test_name
 	now_time=time.localtime()
 	now_time=time.strftime(" %H:%M:%S")
@@ -231,7 +231,7 @@ def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False):
 					display.addstr(sval, 0)
 				else:
 					sval = "      {:3}".format(int(value/10)) # 5white space
-					if digit==1 or (value%10 != 0):
+					if digit==1 or (value%10 != 0) or sw_rotary_mode:
 						sval = sval+"."+str( value%10)
 					sval =sval+"           "#인트 타입으로 바꾸고 마지막 자리에 소숫점가 추가
 					display.addstr(sval, 0)
