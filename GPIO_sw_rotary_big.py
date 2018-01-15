@@ -362,4 +362,4 @@ print("Rotary: start")
 controller=c_Controller()
 controller.daemon =True
 controller.start()
-sw_module.loop_start(test_thing="R", sw_rotary_mode = True)
+sw_module.loop_start(test_thing="R",smallbig = "big", sw_rotary_mode = True)

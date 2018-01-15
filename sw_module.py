@@ -30,7 +30,8 @@ test_name = input("input test#")
 test_name = "S"+test_name
 start_flag = False
 end_flag = False
-f = open('/home/pi/imfusionpump_test/input.txt', 'r')
+f = open('/home/pi/imfusionpump_test/input/smallinput.txt', 'r')
+f2 = open('/home/pi/imfusionpump_test/input/biginput.txt', 'r')
 testNum_list = []
 input_list = []
 time_list = []
@@ -172,26 +173,36 @@ def update_val(delta = 0):
 		value = 9999
 	#print("value:",value)
 
-if test_name == "St":
-	for line in range(0,10):
-			print(line)
-			testNum_list.append(random.randint(1,1999))
-			print(testNum_list)
-			random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
-else:
-	for line in f:
-		print(line)
-		testNum_list.append(int(float(line)*10))
-		print(testNum_list)
-		random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
+def init_testNumber(smallbig = "small",test_name = "NOTTEST"):
+	global f,f2,random_index
+	if test_name == "St":
+		for line in range(0,10):
+				print(line)
+				testNum_list.append(random.randint(1,1999))
+				print(testNum_list)
+				random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
+	else:
+		if smallbig == "big":
+			for line in f:
+				print(line)
+				testNum_list.append(int(float(line)*10))
+				print(testNum_list)
+				random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
+		else:
+			for line in f2:
+				print(line)
+				testNum_list.append(int(float(line)*10))
+				print(testNum_list)
+				random_index=random.sample(range(len(testNum_list)), len(testNum_list)) #random without duplicates
 
 
-def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False,sw_rotary_mode = False):
-	global digit,value,f,time_list,end_flag,a,togle,index,start_flag,test_name
+def loop_start(test_thing = "",smallbig = "small",sw_4dir_mode = False, sw_digit_mode = False,sw_rotary_mode = False):
+	global digit,value,f,time_list,end_flag,a,togle,index,start_flag,test_name,f2
+	init_testNumber(smallbig,test_name)
 	now_time=time.localtime()
 	now_time=time.strftime(" %H:%M:%S")
 	if not test_name == "St":
-		fw = open("/home/pi/Desktop/"+test_thing+"/"+test_thing+test_name+now_time, 'w')
+		fw = open("/home/pi/Desktop/"+test_thing+"/"+test_thing+smallbig+test_name+now_time, 'w')
 	try:
 		while not end_flag:
 			if not start_flag:
@@ -251,8 +262,10 @@ def loop_start(test_thing = "",sw_4dir_mode = False, sw_digit_mode = False,sw_ro
 			fw.write( "sum:{:>.3f}\n".format(sum(time_list)))
 			fw.close()
 		f.close()
+		f2.close()
 	except KeyboardInterrupt:
 		f.close()
+		f2.close()
 		fw.close()
 		GPIO.cleanup()
 

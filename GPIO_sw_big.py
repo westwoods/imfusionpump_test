@@ -97,4 +97,4 @@ GPIO.add_event_detect(21, GPIO.BOTH, callback=swc_callback,bouncetime=10)
 
 
 print("start")
-sw_module.loop_start(test_thing="D",sw_digit_mode = True)
+sw_module.loop_start(test_thing="D",smallbig = "big",sw_digit_mode = True)
